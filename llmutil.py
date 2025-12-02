@@ -29,7 +29,8 @@ def setup_gemini(api_key: str = None) -> bool:
         logger.error("❌ google.generativeai module not installed.")
         return False
 
-    api_key = api_key or os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    #api_key = api_key or os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    api_key = st.secrets["API_KEY"]
 
     if not api_key:
         logger.error("❌ Gemini API key not found. Set GOOGLE_API_KEY in .env")
