@@ -1,0 +1,8 @@
+pandas
+numpy
+matplotlib
+seaborn
+streamlit
+python-dotenv
+mysql-connector-python
+google-generativeai
