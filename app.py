@@ -35,9 +35,12 @@ try:
 except Exception:
     AUTH_AVAILABLE = False '''
 # For SQL lite
-import login_system as auth
-auth.init_database()  # creates SQLite DB automatically
-AUTH_AVAILABLE = True 
+try:
+    import login_system as auth
+    auth.init_database()  # creates SQLite DB automatically
+    AUTH_AVAILABLE = True
+except Exception:
+    AUTH_AVAILABLE = False
 
 # ---------- Streamlit page config ----------
 st.set_page_config(page_title="ProfitLens - Integrated App", page_icon="📊", layout="wide")
