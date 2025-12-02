@@ -27,12 +27,17 @@ try:
     LLM_AVAILABLE = True
 except Exception:
     LLM_AVAILABLE = False
-
+# for MySql
+'''
 try:
     import login_system as auth
     AUTH_AVAILABLE = True
 except Exception:
-    AUTH_AVAILABLE = False
+    AUTH_AVAILABLE = False '''
+# For SQL lite
+import login_system as auth
+auth.init_database()  # creates SQLite DB automatically
+AUTH_AVAILABLE = True 
 
 # ---------- Streamlit page config ----------
 st.set_page_config(page_title="ProfitLens - Integrated App", page_icon="📊", layout="wide")
