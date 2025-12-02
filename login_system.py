@@ -4,19 +4,22 @@ import streamlit as st
 from contextlib import contextmanager
 from dotenv import load_dotenv
 import os
+DB_HOST = st.secrets["DB_HOST"]
+DB_USER = st.secrets["DB_USER"]
+DB_PASSWORD = st.secrets["DB_PASSWORD"]
+DB_NAME = st.secrets["DB_NAME"]
+
 def get_connection():
-    """Get MySQL database connection"""
     try:
         return mysql.connector.connect(
-            host=os.getenv("DB_HOST", "localhost"),
-            user=os.getenv("DB_USER", "root"),
-            password=os.getenv("DB_PASSWORD", ""),
-            database=os.getenv("DB_NAME", "profitlens")
+            host=DB_HOST,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            database=DB_NAME
         )
     except mysql.connector.Error as e:
         st.error(f"Database connection error: {e}")
         return None
-
 @contextmanager
 def get_db_cursor():
     """Context manager for database operations"""
