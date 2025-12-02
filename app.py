@@ -28,12 +28,12 @@ try:
 except Exception:
     LLM_AVAILABLE = False
 # for MySql
-'''
-try:
-    import login_system as auth
-    AUTH_AVAILABLE = True
-except Exception:
-    AUTH_AVAILABLE = False '''
+
+#try:
+    #import login_system as auth
+    #AUTH_AVAILABLE = True
+#except Exception:
+    #AUTH_AVAILABLE = False 
 # For SQL lite
 try:
     import login_system as auth
