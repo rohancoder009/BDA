@@ -1,4 +1,4 @@
-# app2.py - Final integrated version using analysis.py and visualization.py
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,7 +11,6 @@ from datetime import datetime
 # Load env
 load_dotenv()
 
-# Import analysis & visualization (these are the files you provided)
 import analysis as an   # functions for analysis (total_sales_summary, product_amount_wise_sales, ...)
 import visualization as vz  # helper plotting functions returning matplotlib figs
 
@@ -45,7 +44,7 @@ except Exception:
 # ---------- Streamlit page config ----------
 st.set_page_config(page_title="ProfitLens - Integrated App", page_icon="📊", layout="wide")
 
-# ---------- CSS (kept as in your file) ----------
+
 st.markdown("""
 <style>
     .main-header {
@@ -174,10 +173,11 @@ def load_and_process_data_sidebar():
         st.session_state.raw_df = create_sample_data(500)
         st.success("Sample data loaded (500 rows)")
 
-def create_sample_data(n_records=500):
+def create_sample_data(n_records=1000):
     np.random.seed(42)
     dates = pd.date_range(start='2024-01-01', periods=n_records, freq='D')
     categories = ['Electronics','Clothing','Home & Garden','Sports','Books']
+    city = ['Jaipur','jaisalmer','Bikaner','Ajmer','Bhilwara']
     genders = ['M','F']
     data = {
         'Transaction ID': [f'TXN{i:06d}' for i in range(1, n_records+1)],
@@ -188,6 +188,7 @@ def create_sample_data(n_records=500):
         'Product Category': np.random.choice(categories, n_records),
         'Quantity': np.random.randint(1,6,n_records),
         'Price per Unit': np.round(np.random.uniform(10,500,n_records),2),
+        'City':np.random.choice(city,n_records)
     }
     df = pd.DataFrame(data)
     df['Total Amount'] = (df['Quantity'] * df['Price per Unit']).round(2)
