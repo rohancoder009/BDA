@@ -8,6 +8,7 @@ DB_HOST = st.secrets["DB_HOST"]
 DB_USER = st.secrets["DB_USER"]
 DB_PASSWORD = st.secrets["DB_PASSWORD"]
 DB_NAME = st.secrets["DB_NAME"]
+DB_Port= st.secrets["db_port"]
 
 def get_connection():
     try:
@@ -15,7 +16,8 @@ def get_connection():
             host=DB_HOST,
             user=DB_USER,
             password=DB_PASSWORD,
-            database=DB_NAME
+            database=DB_NAME,
+            port = int(DB_Port)
         )
     except mysql.connector.Error as e:
         st.error(f"Database connection error: {e}")
