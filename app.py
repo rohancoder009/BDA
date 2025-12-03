@@ -179,6 +179,7 @@ def create_sample_data(n_records=1000):
     categories = ['Electronics','Clothing','Home & Garden','Sports','Books']
     city = ['Jaipur','jaisalmer','Bikaner','Ajmer','Bhilwara']
     genders = ['M','F']
+    margins = np.random.uniform(0.2, 0.4, n_records)
     data = {
         'Transaction ID': [f'TXN{i:06d}' for i in range(1, n_records+1)],
         'Date': np.random.choice(dates, n_records),
@@ -188,10 +189,11 @@ def create_sample_data(n_records=1000):
         'Product Category': np.random.choice(categories, n_records),
         'Quantity': np.random.randint(1,6,n_records),
         'Price per Unit': np.round(np.random.uniform(10,500,n_records),2),
-        'City':np.random.choice(city,n_records)
+        'City':np.random.choice(city,n_records),
     }
     df = pd.DataFrame(data)
     df['Total Amount'] = (df['Quantity'] * df['Price per Unit']).round(2)
+    df['Cost Price'] = np.round(df['Price per Unit'] / (1 + margins), 2)
     return df
 
 # ---------- Apply mapping and cleaning ----------
