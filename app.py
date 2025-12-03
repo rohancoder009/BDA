@@ -471,7 +471,7 @@ def category_panel(df):
     st.subheader(f"Top {topk} Categories")
     if st.session_state.view_type == 'visual':
         try:
-            fig, ax = plt.subplots(figsize=(8,6))
+            fig, ax = plt.subplots(figsize=(4,4))
             ax.pie(topcats['Total Amount'], labels=topcats['Product Category'], autopct="%1.1f%%", startangle=90)
             ax.set_title(f"Top {topk} Categories by Sales")
             st.pyplot(fig)
