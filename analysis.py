@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-# =====================================================================
-# ORIGINAL FUNCTIONS (kept exactly as they were)
-# =====================================================================
 
 def total_sales_summary(df):
     total_sales = df['Total Amount'].sum()
@@ -57,10 +54,7 @@ def top_customers_by_sales(df, n=5):
 
 def average_basket_size(df):
     return round(df['Quantity'].mean(), 2)
-
-# =====================================================================
-# NEW ADVANCED BUSINESS ANALYSIS FUNCTIONS (20+)
-# =====================================================================
+===========
 
 # ---------- SALES ANALYSIS ----------
 
@@ -208,8 +202,6 @@ def regional_sales_analysis(df):
     if 'Region' in df.columns:
         return df.groupby('Region')['Total Amount'].sum().sort_values(ascending=False)
     return "Region column not found"
-
-# ---------- BONUS ----------
 
 def discount_effectiveness(df):
     if 'Discount' in df.columns:
