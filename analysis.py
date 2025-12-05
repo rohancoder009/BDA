@@ -54,7 +54,6 @@ def top_customers_by_sales(df, n=5):
 
 def average_basket_size(df):
     return round(df['Quantity'].mean(), 2)
-===========
 
 # ---------- SALES ANALYSIS ----------
 
