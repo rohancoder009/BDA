@@ -4,11 +4,11 @@ import streamlit as st
 from contextlib import contextmanager
 from dotenv import load_dotenv
 import os
-DB_HOST = st.secrets["DB_HOST"]
-DB_USER = st.secrets["DB_USER"]
-DB_PASSWORD = st.secrets["DB_PASSWORD"]
-DB_NAME = st.secrets["DB_NAME"]
-DB_Port= st.secrets["db_port"]
+DB_HOST = st.secrets["DB_HOST"] or os.getenv('DB_HOST')
+DB_USER = st.secrets["DB_USER"] or os.getenv('DB_USER')
+DB_PASSWORD = st.secrets["DB_PASSWORD"] or os.getenv('DB_PASSWORD')
+DB_NAME = st.secrets["DB_NAME"] or os.getenv('DB_NAME')
+DB_Port= st.secrets["db_port"] or os.getenv('DB_PORT')
 
 def get_connection():
     try:
