@@ -193,7 +193,7 @@ def create_sample_data(n_records=1000):
     }
     df = pd.DataFrame(data)
     df['Total Amount'] = (df['Quantity'] * df['Price per Unit']).round(2)
-    df['Cost Price'] = np.round(df['Price per Unit'] / (1 + margins), 2)
+    df['CostPrice'] = np.round(df['Price per Unit'] / (1 + margins), 2)
     return df
 
 # ---------- Apply mapping and cleaning ----------
@@ -486,7 +486,7 @@ def category_panel(df):
 # ---------- Profit & inventory ----------
 def profit_inventory_panel(df):
     st.header("💰 Profit & Inventory")
-    if 'Cost Price' in df.columns or 'Cost' in df.columns:
+    if 'CostPrice' in df.columns or 'Cost' in df.columns:
         try:
             profit = an.total_profit(df)
             margin = an.profit_margin(df)
