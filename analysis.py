@@ -173,13 +173,13 @@ def anomaly_detection(df):
 # ---------- PROFIT & OPERATIONS ----------
 
 def total_profit(df):
-    if 'Cost Price' in df.columns:
+    if 'CostPrice' in df.columns:
         df['Profit'] = (df['Price per Unit'] - df['Cost Price']) * df['Quantity']
         return df['Profit'].sum()
     return "Cost Price column missing"
 
 def profit_margin(df):
-    if 'Cost Price' in df.columns:
+    if 'CostPrice' in df.columns:
         profit = total_profit(df)
         revenue = df['Total Amount'].sum()
         return (profit / revenue) * 100
