@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -268,32 +267,68 @@ def product_analysis_panel(df):
 
     # Choose metric
     metric = st.selectbox("Metric", ["Revenue","Quantity","Both"])
-    # Top N
     topn = st.session_state.top_n_products
 
+    # --- Revenue & Quantity Side by Side ---
     if metric in ("Revenue","Both"):
-        st.subheader(f"Top {topn} Products by Revenue")
-        # use analysis function product_amount_wise_sales
-        rev = an.product_amount_wise_sales(filtered, n=topn)
-        # rev is a Series indexed by Product Category
-        if st.session_state.view_type == 'visual':
-            # use visualization helper
-            try:
-                fig = vz.visualize_top_selling_products_by_amount(filtered, n=topn)
-                st.pyplot(fig)
-            except Exception:
-                # fallback simple matplotlib
-                rev_df = rev.reset_index()
-                fig, ax = plt.subplots(figsize=(10,6))
-                ax.barh(rev_df['Product Category'], rev_df['Total Amount'] if 'Total Amount' in rev_df.columns else rev_df[rev.name])
-                ax.set_xlabel("Revenue")
-                st.pyplot(fig)
+        if metric in ("Quantity","Both"):
+            # Show both side by side
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.subheader(f"Top {topn} Products by Revenue")
+                rev = an.product_amount_wise_sales(filtered, n=topn)
+                if st.session_state.view_type == 'visual':
+                    try:
+                        fig = vz.visualize_top_selling_products_by_amount(filtered, n=topn)
+                        st.pyplot(fig)
+                    except Exception:
+                        rev_df = rev.reset_index()
+                        fig, ax = plt.subplots(figsize=(8,5))
+                        ax.barh(rev_df['Product Category'], rev_df['Total Amount'] if 'Total Amount' in rev_df.columns else rev_df[rev.name])
+                        ax.set_xlabel("Revenue")
+                        st.pyplot(fig)
+                else:
+                    rev_df = rev.reset_index()
+                    rev_df.columns = ['Product Category','Total Amount'] if len(rev_df.columns)>=2 else ['Product Category','Total Amount']
+                    st.dataframe(rev_df)
+            
+            with col2:
+                st.subheader(f"Top {topn} Products by Quantity")
+                qty = an.top_selling_products(filtered, n=topn)
+                if st.session_state.view_type == 'visual':
+                    try:
+                        fig = vz.visualize_top_selling_products(filtered, n=topn)
+                        st.pyplot(fig)
+                    except Exception:
+                        qty_df = qty.reset_index()
+                        fig, ax = plt.subplots(figsize=(8,5))
+                        ax.barh(qty_df['Product Category'], qty_df['Quantity'] if 'Quantity' in qty_df.columns else qty_df[qty.name])
+                        ax.set_xlabel("Units Sold")
+                        st.pyplot(fig)
+                else:
+                    qty_df = qty.reset_index()
+                    qty_df.columns = ['Product Category','Quantity']
+                    st.dataframe(qty_df)
         else:
-            rev_df = rev.reset_index()
-            rev_df.columns = ['Product Category','Total Amount'] if len(rev_df.columns)>=2 else ['Product Category','Total Amount']
-            st.dataframe(rev_df)
+            # Only revenue
+            st.subheader(f"Top {topn} Products by Revenue")
+            rev = an.product_amount_wise_sales(filtered, n=topn)
+            if st.session_state.view_type == 'visual':
+                try:
+                    fig = vz.visualize_top_selling_products_by_amount(filtered, n=topn)
+                    st.pyplot(fig)
+                except Exception:
+                    rev_df = rev.reset_index()
+                    fig, ax = plt.subplots(figsize=(10,6))
+                    ax.barh(rev_df['Product Category'], rev_df['Total Amount'] if 'Total Amount' in rev_df.columns else rev_df[rev.name])
+                    ax.set_xlabel("Revenue")
+                    st.pyplot(fig)
+            else:
+                rev_df = rev.reset_index()
+                st.dataframe(rev_df)
 
-    if metric in ("Quantity","Both"):
+    elif metric == "Quantity":
         st.subheader(f"Top {topn} Products by Quantity")
         qty = an.top_selling_products(filtered, n=topn)
         if st.session_state.view_type == 'visual':
@@ -308,152 +343,171 @@ def product_analysis_panel(df):
                 st.pyplot(fig)
         else:
             qty_df = qty.reset_index()
-            qty_df.columns = ['Product Category','Quantity']
             st.dataframe(qty_df)
 
-    # Product monthly performance (heatmap/line)
-    if st.checkbox("Show product monthly performance"):
-        try:
-            perf = an.product_monthly_performance(filtered)
-            if st.session_state.view_type == 'visual':
-                fig = vz.visualize_product_monthly_performance(filtered)
-                st.pyplot(fig)
-            else:
-                st.dataframe(perf.head(200))
-        except Exception as e:
-            st.error(f"Error product monthly perf: {e}")
+    # Product monthly performance & Price elasticity side by side
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.checkbox("Show product monthly performance"):
+            try:
+                perf = an.product_monthly_performance(filtered)
+                if st.session_state.view_type == 'visual':
+                    fig = vz.visualize_product_monthly_performance(filtered)
+                    st.pyplot(fig)
+                else:
+                    st.dataframe(perf.head(200))
+            except Exception as e:
+                st.error(f"Error product monthly perf: {e}")
 
-    # Price elasticity
-    if st.checkbox("Show price elasticity by category"):
-        try:
-            elast = an.price_elasticity(filtered)
-            if st.session_state.view_type == 'visual':
-                fig = vz.visualize_price_elasticity(filtered)
-                st.pyplot(fig)
-            else:
-                st.dataframe(elast)
-        except Exception as e:
-            st.error(f"Error elasticity: {e}")
+    with col2:
+        if st.checkbox("Show price elasticity by category"):
+            try:
+                elast = an.price_elasticity(filtered)
+                if st.session_state.view_type == 'visual':
+                    fig = vz.visualize_price_elasticity(filtered)
+                    st.pyplot(fig)
+                else:
+                    st.dataframe(elast)
+            except Exception as e:
+                st.error(f"Error elasticity: {e}")
 
 # ---------- Customer analysis ----------
 def customer_analysis_panel(df):
     st.header("👥 Customer Analysis")
 
     topn = st.session_state.top_n_customers
-    # Top customers
-    st.subheader(f"Top {topn} Customers by Revenue")
-    top_cust = an.top_customers_by_sales(df, n=topn)
-    # top_cust is Series indexed by Customer ID
-    if st.session_state.view_type == 'visual':
-        try:
-            fig = vz.visualize_top_customers(df, n=topn)
-            st.pyplot(fig)
-        except Exception:
-            df_tc = top_cust.reset_index()
-            df_tc.columns = ['Customer ID','Total Amount']
-            fig, ax = plt.subplots(figsize=(10,6))
-            ax.barh(df_tc['Customer ID'], df_tc['Total Amount'])
-            st.pyplot(fig)
-    else:
-        st.dataframe(top_cust.reset_index().rename(columns={top_cust.name: 'Total Amount'}))
-
-    # New vs returning
-    st.subheader("New vs Returning Customers")
-    newret = an.new_vs_returning_customers(df)
-    if st.session_state.view_type == 'visual':
-        try:
-            fig = vz.visualize_new_vs_returning(df)
-            st.pyplot(fig)
-        except Exception:
-            fig, ax = plt.subplots()
-            ax.bar(newret.index.astype(str), newret.values)
-            st.pyplot(fig)
-    else:
-        st.dataframe(newret.reset_index().rename(columns={0:'Count'}))
-
-    # RFM segment (table)
-    if st.checkbox("Show RFM segmentation (table)"):
-        try:
-            rfm = an.rfm_segmentation(df)
-            st.dataframe(rfm.head(200))
-        except Exception as e:
-            st.error(f"RFM error: {e}")
-
-    # CLV & retention
-    try:
-        clv = an.customer_lifetime_value(df)
-        st.metric("Estimated CLV (approx)", f"{clv:,.2f}")
-    except Exception:
-        pass
-    try:
-        retention = an.customer_retention_rate(df)
+    
+    # Top customers & New vs Returning side by side
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader(f"Top {topn} Customers by Revenue")
+        top_cust = an.top_customers_by_sales(df, n=topn)
         if st.session_state.view_type == 'visual':
             try:
-                fig = vz.visualize_retention_rate(df)
+                fig = vz.visualize_top_customers(df, n=topn)
                 st.pyplot(fig)
             except Exception:
-                st.line_chart(retention)
+                df_tc = top_cust.reset_index()
+                df_tc.columns = ['Customer ID','Total Amount']
+                fig, ax = plt.subplots(figsize=(8,5))
+                ax.barh(df_tc['Customer ID'], df_tc['Total Amount'])
+                st.pyplot(fig)
         else:
-            st.dataframe(retention.reset_index().rename(columns={retention.name:'Retention %'}))
-    except Exception:
-        pass
+            st.dataframe(top_cust.reset_index().rename(columns={top_cust.name: 'Total Amount'}))
+
+    with col2:
+        st.subheader("New vs Returning Customers")
+        newret = an.new_vs_returning_customers(df)
+        if st.session_state.view_type == 'visual':
+            try:
+                fig = vz.visualize_new_vs_returning(df)
+                st.pyplot(fig)
+            except Exception:
+                fig, ax = plt.subplots()
+                ax.bar(newret.index.astype(str), newret.values)
+                st.pyplot(fig)
+        else:
+            st.dataframe(newret.reset_index().rename(columns={0:'Count'}))
+
+    # RFM & CLV side by side
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        if st.checkbox("Show RFM segmentation"):
+            try:
+                rfm = an.rfm_segmentation(df)
+                st.dataframe(rfm.head(200))
+            except Exception as e:
+                st.error(f"RFM error: {e}")
+
+    with col2:
+        st.subheader("Customer Metrics")
+        try:
+            clv = an.customer_lifetime_value(df)
+            st.metric("Estimated CLV", f"${clv:,.2f}")
+        except Exception:
+            pass
+        
+        try:
+            retention = an.customer_retention_rate(df)
+            if st.session_state.view_type == 'visual':
+                try:
+                    fig = vz.visualize_retention_rate(df)
+                    st.pyplot(fig)
+                except Exception:
+                    st.line_chart(retention)
+            else:
+                st.dataframe(retention.reset_index().rename(columns={retention.name:'Retention %'}))
+        except Exception:
+            pass
 
 # ---------- Trends panel ----------
 def trends_panel(df):
     st.header("📅 Trends & Forecasting")
-    # monthly trend
-    st.subheader("Monthly Sales Trend")
-    monthly = an.monthly_sales_trend(df)
-    if st.session_state.view_type == 'visual':
-        try:
-            fig = vz.visualize_monthly_sales_trend(df)
-            st.pyplot(fig)
-        except Exception:
-            st.line_chart(monthly.set_index('Month')['Total Amount'])
-    else:
-        st.dataframe(monthly)
+    
+    # Monthly trend & Month-over-month growth side by side
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Monthly Sales Trend")
+        monthly = an.monthly_sales_trend(df)
+        if st.session_state.view_type == 'visual':
+            try:
+                fig = vz.visualize_monthly_sales_trend(df)
+                st.pyplot(fig)
+            except Exception:
+                st.line_chart(monthly.set_index('Month')['Total Amount'])
+        else:
+            st.dataframe(monthly)
 
-    # Growth
-    st.subheader("Month-over-month Growth")
-    growth = an.monthly_growth_rate(df)
-    if st.session_state.view_type == 'visual':
-        try:
-            fig = vz.visualize_monthly_growth_rate(df)
-            st.pyplot(fig)
-        except Exception:
-            fig, ax = plt.subplots(figsize=(10,4))
-            ax.bar(growth['Month'], growth['Growth %'])
-            st.pyplot(fig)
-    else:
-        st.dataframe(growth)
+    with col2:
+        st.subheader("Month-over-month Growth")
+        growth = an.monthly_growth_rate(df)
+        if st.session_state.view_type == 'visual':
+            try:
+                fig = vz.visualize_monthly_growth_rate(df)
+                st.pyplot(fig)
+            except Exception:
+                fig, ax = plt.subplots(figsize=(8,5))
+                ax.bar(growth['Month'], growth['Growth %'])
+                ax.set_xlabel("Month")
+                ax.set_ylabel("Growth %")
+                st.pyplot(fig)
+        else:
+            st.dataframe(growth)
 
-    # Moving average & forecast
-    window = st.slider("Moving average window (days)", 3, 30, 7)
-    ma = an.moving_average_sales(df, window=window)
-    st.subheader(f"{window}-day moving average (daily)")
-    if st.session_state.view_type == 'visual':
-        try:
-            fig = vz.visualize_moving_average(df, window=window)
-            st.pyplot(fig)
-        except Exception:
-            st.line_chart(ma)
-    else:
-        st.dataframe(ma.reset_index())
+    # Moving average & Forecast side by side
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        window = st.slider("Moving average window (days)", 3, 30, 7)
+        ma = an.moving_average_sales(df, window=window)
+        st.subheader(f"{window}-day moving average")
+        if st.session_state.view_type == 'visual':
+            try:
+                fig = vz.visualize_moving_average(df, window=window)
+                st.pyplot(fig)
+            except Exception:
+                st.line_chart(ma)
+        else:
+            st.dataframe(ma.reset_index())
 
-    # Forecast
-    periods = st.number_input("Forecast months", min_value=1, max_value=36, value=6)
-    forecast = an.sales_forecast(df, periods=periods)
-    st.subheader("Simple forecast (projection)")
-    if st.session_state.view_type == 'visual':
-        try:
-            fig = vz.visualize_sales_forecast(df, periods=periods)
-            st.pyplot(fig)
-        except Exception:
-            st.line_chart(forecast.values)
-    else:
-        st.dataframe(pd.DataFrame({'Period': range(1,len(forecast)+1), 'Forecast': forecast.values}))
+    with col2:
+        periods = st.number_input("Forecast months", min_value=1, max_value=36, value=6)
+        forecast = an.sales_forecast(df, periods=periods)
+        st.subheader("Sales Forecast")
+        if st.session_state.view_type == 'visual':
+            try:
+                fig = vz.visualize_sales_forecast(df, periods=periods)
+                st.pyplot(fig)
+            except Exception:
+                st.line_chart(forecast.values)
+        else:
+            st.dataframe(pd.DataFrame({'Period': range(1,len(forecast)+1), 'Forecast': forecast.values}))
 
-    # Anomaly detection
+    # Anomalies
     if st.checkbox("Show anomalies (daily)"):
         try:
             anomalies = an.anomaly_detection(df)
