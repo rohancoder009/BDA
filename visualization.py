@@ -3,14 +3,15 @@ import seaborn as sns
 import numpy as np
 import pandas as pd
 import analysis as an
-
 plt.style.use("default")
 sns.set_palette("husl")
 
 # Helper for charts
-def _fig_ax(figsize=(4, 4)):
-    fig, ax = plt.subplots(figsize=figsize)
+def _fig_ax(figsize=(8, 4.5)):
+    fig, ax = plt.subplots(figsize=figsize, dpi=110)
+    plt.tight_layout()
     return fig, ax
+
 
 # ======================================================
 # BASIC EXISTING VISUALIZATIONS
@@ -39,7 +40,7 @@ def visualize_top_selling_products_by_amount(df, n=10):
 
 def visualize_daily_sales_trend(df):
     data = an.daily_sales_trend(df)
-    fig, ax = _fig_ax((4, 4))
+    fig, ax = _fig_ax((14, 6))
 
     ax.plot(data.index, data.values, marker="o")
     ax.fill_between(data.index, data.values, alpha=0.25)
@@ -50,7 +51,7 @@ def visualize_daily_sales_trend(df):
 
 def visualize_monthly_sales_trend(df):
     data = an.monthly_sales_trend(df)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((14, 6))
 
     ax.plot(data["Month"], data["Total Amount"], marker="o", linewidth=3)
     ax.set_title("Monthly Sales Trend")
@@ -85,7 +86,7 @@ def visualize_monthly_growth_rate(df):
 # ------------------ SALES DISTRIBUTION ----------------
 def visualize_sales_distribution(df):
     data = an.sales_distribution_by_category(df)
-    fig, ax = plt.subplots(figsize=(4, 4))
+    fig, ax = plt.subplots(figsize=(9, 9))
 
     ax.pie(data, labels=data.index, autopct="%1.1f%%")
     ax.set_title("Sales Distribution by Category")
@@ -135,7 +136,7 @@ def visualize_price_elasticity(df):
 # ------------------ PRODUCT MONTHLY PERFORMANCE --------
 def visualize_product_monthly_performance(df):
     data = an.product_monthly_performance(df)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((14, 6))
 
     for cat in data["Product Category"].unique():
         temp = data[data["Product Category"] == cat]
@@ -170,7 +171,7 @@ def visualize_retention_rate(df):
 # ------------------ RFM HEATMAP ------------------------
 def visualize_rfm_heatmap(df):
     rfm = an.rfm_segmentation(df)
-    fig, ax = _fig_ax((4, 4))
+    fig, ax = _fig_ax((12, 6))
 
     sns.heatmap(rfm.corr(), annot=True, cmap="Blues", linewidths=0.5, ax=ax)
     ax.set_title("RFM Correlation Heatmap")
@@ -230,7 +231,7 @@ def visualize_sales_anomalies(df):
 # ------------------ AGE GROUP --------------------------
 def visualize_age_group_analysis(df):
     data = an.age_group_analysis(df)
-    fig, ax = _fig_ax((4, 4))
+    fig, ax = _fig_ax((12, 6))
 
     sns.barplot(data=data, x="Age Group", y="Total Amount", hue="Gender", ax=ax)
     ax.set_title("Age Group Spending Comparison")
@@ -239,7 +240,7 @@ def visualize_age_group_analysis(df):
 # ------------------ GENDER QUANTITY ---------------------
 def visualize_genderwise_quantity(df):
     data = an.genderwise_quantity_table(df)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((14, 6))
 
     sns.heatmap(data, annot=True, cmap="Purples", ax=ax)
     ax.set_title("Gender-wise Quantity Heatmap")
@@ -248,7 +249,7 @@ def visualize_genderwise_quantity(df):
 # ------------------ GENDER REVENUE ----------------------
 def visualize_genderwise_amount(df):
     data = an.genderwise_amount_table(df)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((14, 6))
 
     sns.heatmap(data, annot=True, cmap="Oranges", ax=ax)
     ax.set_title("Gender-wise Revenue Heatmap")
@@ -257,7 +258,7 @@ def visualize_genderwise_amount(df):
 # ------------------ TOP SELLING DAYS --------------------
 def visualize_top_selling_days(df, n=5):
     data = an.top_selling_days(df, n)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((14, 6))
 
     ax.bar(data.index, data.values)
     ax.set_title("Top Selling Days")
@@ -267,7 +268,7 @@ def visualize_top_selling_days(df, n=5):
 # ------------------ TOP CUSTOMERS -----------------------
 def visualize_top_customers(df, n=10):
     data = an.top_customers_by_sales(df, n)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((12, 6))
 
     ax.bar(data.index, data.values)
     ax.set_title("Top Customers by Revenue")
@@ -282,7 +283,7 @@ def visualize_total_profit(df):
     df["Profit"] = (df["Price per Unit"] - df["Cost Price"]) * df["Quantity"]
     data = df.groupby("Product Category")["Profit"].sum()
 
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((12, 6))
     ax.bar(data.index, data.values, color="green")
     ax.set_title("Profit by Product Category")
     plt.xticks(rotation=45)
@@ -303,7 +304,7 @@ def visualize_profit_margin(df):
 # ------------------ STOCK OUT RISK ----------------------
 def visualize_stock_out_risk(df, inventory_df):
     data = an.stock_out_risk(df, inventory_df)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((12, 6))
 
     ax.bar(data["Product Category"], data["Days Left"], color="red")
     ax.set_title("Stock-out Risk (Days Left)")
@@ -313,7 +314,7 @@ def visualize_stock_out_risk(df, inventory_df):
 # ------------------ REORDER SUGGESTION ------------------
 def visualize_reorder_suggestion(df, inventory_df):
     data = an.reorder_suggestion(df, inventory_df)
-    fig, ax = _fig_ax((4, 6))
+    fig, ax = _fig_ax((12, 6))
 
     ax.bar(data["Product Category"], data["Reorder Point"], color="purple")
     ax.set_title("Reorder Point Suggestion")
