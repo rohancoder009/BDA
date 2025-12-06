@@ -8,7 +8,7 @@ plt.style.use("default")
 sns.set_palette("husl")
 
 # Helper for charts
-def _fig_ax(figsize=(4, 6):
+def _fig_ax(figsize=(4, 4)):
     fig, ax = plt.subplots(figsize=figsize)
     return fig, ax
 
